@@ -20,7 +20,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author lekeping
  */
 @RestController
-public class Votecontrollor {
+public class VoteControllor {
     private CandidatesDao candidatesDao = CandidatesDao.getInstance();
     private List<SseEmitter> sseEmitterList = new CopyOnWriteArrayList<>();
     private UsersDao usersDao = UsersDao.getInstance();
@@ -46,8 +46,8 @@ public class Votecontrollor {
     @PostMapping(value = "/vote")
     public ResponseEntity<Object> vote(@RequestParam String candidateName, @RequestParam int userId) throws LockTimeOutException, InterruptedException, CandidateNotFoundException, UserNotFoundException {
         if (usersDao.voteValidate(userId)) {
-            candidatesDao.incr(candidateName);
-            usersDao.incrVote(userId);
+            candidatesDao.incrementVote(candidateName);
+            usersDao.incrementVoteCount(userId);
         } else {
             return new ResponseEntity<>("Exceed daily vote limit", HttpStatus.BAD_REQUEST);
         }
@@ -55,6 +55,14 @@ public class Votecontrollor {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    /**
+     * 使用Spring boot @Scheduled notation
+     * 每秒推送投票
+     *
+     * @return
+     * @throws LockTimeOutException
+     * @throws InterruptedException
+     */
     @Scheduled(fixedRate = 1000)
     private ResponseEntity<Object> pushVotes() throws LockTimeOutException, InterruptedException {
 

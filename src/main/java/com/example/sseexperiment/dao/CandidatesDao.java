@@ -9,13 +9,15 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author lekeping
+ */
 public class CandidatesDao {
-    // 应该从config里面load吗
+
     private static final CandidatesDao INSTANCE = new CandidatesDao();
     private final int MAX_CANDIDATES_NUM = 10;
     private Map<String, Integer> candidates = new HashMap<>(MAX_CANDIDATES_NUM);
     private final ReadWriteLock lock = new ReadWriteLock();
-    private final long SYNC_TIME_OUT = 1000;
 
     private CandidatesDao() {
         init();
@@ -25,7 +27,12 @@ public class CandidatesDao {
         return INSTANCE;
     }
 
-    public boolean init() {
+    /**
+     * mock data here
+     *
+     * @return
+     */
+    public void init() {
         candidates.put("A", 0);
         candidates.put("AA", 0);
         candidates.put("AAA", 0);
@@ -36,10 +43,9 @@ public class CandidatesDao {
         candidates.put("CC", 0);
         candidates.put("CCC", 0);
         candidates.put("D", 0);
-        return true;
     }
 
-    public void incr(String name) throws InterruptedException, LockTimeOutException, CandidateNotFoundException {
+    public void incrementVote(String name) throws InterruptedException, LockTimeOutException, CandidateNotFoundException {
 
         lock.lockWrite();
         if (candidates.get(name) == null) {

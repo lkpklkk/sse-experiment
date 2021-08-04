@@ -14,10 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * @author lekeping
+ */
 @RestController
 public class UserControllor {
     private AtomicInteger curId = new AtomicInteger(0);
     private UsersDao usersDao = UsersDao.getInstance();
+
 
     @CrossOrigin
     @GetMapping("/signup")
@@ -28,6 +32,7 @@ public class UserControllor {
         jsonObject.put("userId", userId);
         return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
     }
+
 
     @CrossOrigin
     @GetMapping("/signin")
@@ -40,7 +45,14 @@ public class UserControllor {
         }
     }
 
-    @Scheduled(fixedRate = 1000 * 60)
+    /**
+     * 使用Spring boot @Scheduled notation
+     * 实现每天重置每人票数
+     *
+     * @throws LockTimeOutException
+     * @throws InterruptedException
+     */
+    @Scheduled(fixedRate = 1000 * 60 * 60 * 24)
     public void reset() throws LockTimeOutException, InterruptedException {
         usersDao.voteCountReset();
     }

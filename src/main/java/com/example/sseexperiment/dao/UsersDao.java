@@ -17,7 +17,7 @@ public class UsersDao {
         return INSTANCE;
     }
 
-    public void incrVote(int userId) throws LockTimeOutException, InterruptedException, UserNotFoundException {
+    public void incrementVoteCount(int userId) throws LockTimeOutException, InterruptedException, UserNotFoundException {
         readWriteLock.lockWrite();
         Integer oldValue;
         if ((oldValue = voteCount.get(userId)) == null) {
