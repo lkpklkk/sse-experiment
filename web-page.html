@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<body>
+
+<h1>Vote Panel</h1>
+<button id="signup">sign up</button>
+<br>
+<input type="number" id="userId" placeholder="put userId here">
+<button id="signin">sign in</button>
+<br>
+<input type="text" id="candidate-name" placeholder="person to vote here">
+<button id="vote-button">Submit</button>
+<br>
+<button id="clear">clear</button>
+<div id="userId display">not logged in</div>
+<div id="result"></div>
+
+<script>
+
+
+var signedin =false;
+var userId = -1;
+document.getElementById("userId display").innerHTML += userId;  
+
+const signupButton = document.getElementById("signup");
+const signinButton = document.getElementById("signin")
+const voteButton = document.getElementById("vote-button");
+const clearButton = document.getElementById("clear");
+document.addEventListener("DOMContentLoaded", function(){
+signupButton.addEventListener('click',function(){
+  if(signedin){
+    alert("already signed in")
+    return;
+  }
+  const response =  fetch('http://localhost:8089/signup', {
+      method: 'get',
+    }).then((response) => {
+  if (!response.ok) {
+    response.text().then((data)=>{
+      alert(response.status + ' ' + data)
+    })
+    return;
+  } else{
+
+    response.json().then(data => {
+      userId = data.userId
+      document.getElementById("userId display").innerHTML = "current userId :" + userId
+});
+    signedin = true;
+    if(typeof(EventSource) !== "undefined") {
+  var source = new EventSource("http://localhost:8089/subscribe");
+
+  source.addEventListener("newest votes", function(event){
+    console.log("Event" + event);
+    document.getElementById("result").innerHTML += event.data;
+  })
+  
+} else {
+  alert("Your browser doesn't support sse events, plz switch to a modern browser");
+}
+  }
+})
+})
+signinButton.addEventListener('click', async _ => {
+  if(signedin){
+    alert("already signed in")
+    return;
+  }
+  var inputUserId = document.getElementById("userId");
+  const requestUrl = 'http://localhost:8089/signin?userId='+document.getElementById("userId").value.toString();
+  const response = await fetch(requestUrl, {
+      method: 'get',
+    }).then((response) => {
+  if (!response.ok) {
+    response.text().then((data)=> {
+      alert(response.status + " "+  data)
+    })
+    
+    return;
+  } else{
+    
+    userId = inputUserId;
+    document.getElementById("userId display").innerHTML = "current userId :" + userId
+
+    signedin = true;
+    if(typeof(EventSource) !== "undefined") {
+  var source = new EventSource("http://localhost:8089/subscribe");
+
+  source.addEventListener("newest votes", function(event){
+    console.log("Event" + event);
+    document.getElementById("result").innerHTML += event.data;
+  })
+  
+} else {
+  alert("Your browser doesn't support sse events, plz switch to a modern browser");
+}
+  }
+})
+});
+voteButton.addEventListener('click', async _ => {
+  try {    
+    var data = document.getElementById("candidate-name").value 
+    var requestUrl = "http://localhost:8089/vote"  + "?" + "candidateName=" + data.toString()  + "&userId=" + userId.toString()
+    console.log(requestUrl)
+    const response = await fetch(requestUrl, {
+      method: 'post',
+    }).then((response) => {
+  if (!response.ok) {
+    response.text().then((data)=>{
+      alert(response.status + ' '+ data);
+    })
+    
+  } 
+});
+    console.log('Completed!', response);
+  } catch(err) {
+    console.error(`Error: ${err}`);
+  }
+});
+clearButton.addEventListener('click', function(){
+  document.getElementById("result").innerHTML = "";
+});
+});
+
+
+
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
+
