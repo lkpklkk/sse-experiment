@@ -47,7 +47,7 @@ public class UserControllor {
 
     /**
      * 使用Spring boot @Scheduled notation
-     * 实现每天重置每人票数
+     * 实现每天 (1000 * 60 * 60 * 24 毫秒) 重置每人票数
      *
      * @throws LockTimeOutException
      * @throws InterruptedException
