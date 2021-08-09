@@ -1,9 +1,9 @@
 package com.example.sseexperiment.controllors;
 
-import com.example.sseexperiment.dao.CandidatesDao;
+import com.example.sseexperiment.dao.NpcDao;
 import com.example.sseexperiment.dao.UsersDao;
-import com.example.sseexperiment.exceptions.CandidateNotFoundException;
 import com.example.sseexperiment.exceptions.LockTimeOutException;
+import com.example.sseexperiment.exceptions.NpcNotFoundException;
 import com.example.sseexperiment.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,8 +20,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author lekeping
  */
 @RestController
-public class VoteControllor {
-    private CandidatesDao candidatesDao = CandidatesDao.getInstance();
+public class VoteNpcControllor {
+    private NpcDao npcDao = NpcDao.getInstance();
     private List<SseEmitter> sseEmitterList = new CopyOnWriteArrayList<>();
     private UsersDao usersDao = UsersDao.getInstance();
     //TODO: implement error handling?
@@ -44,9 +44,9 @@ public class VoteControllor {
 
     @CrossOrigin
     @PostMapping(value = "/vote")
-    public ResponseEntity<Object> vote(@RequestParam String candidateName, @RequestParam int userId) throws LockTimeOutException, InterruptedException, CandidateNotFoundException, UserNotFoundException {
+    public ResponseEntity<Object> vote(@RequestParam String candidateName, @RequestParam int userId) throws LockTimeOutException, InterruptedException, NpcNotFoundException, UserNotFoundException {
         if (usersDao.voteValidate(userId)) {
-            candidatesDao.incrementVote(candidateName);
+            npcDao.incrementVote(candidateName);
             usersDao.incrementVoteCount(userId);
         } else {
             return new ResponseEntity<>("Exceed daily vote limit", HttpStatus.BAD_REQUEST);
@@ -66,7 +66,7 @@ public class VoteControllor {
     @Scheduled(fixedRate = 1000)
     private ResponseEntity<Object> pushVotes() throws LockTimeOutException, InterruptedException {
 
-        String dataString = candidatesDao.getVotes().toString();
+        String dataString = npcDao.getVotes().toString();
 
         sseEmitterList.forEach(sseEmitter -> {
             try {

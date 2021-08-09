@@ -1,5 +1,8 @@
-package com.example.sseexperiment.exceptions;
+package com.example.sseexperiment;
 
+import com.example.sseexperiment.exceptions.LockTimeOutException;
+import com.example.sseexperiment.exceptions.NpcNotFoundException;
+import com.example.sseexperiment.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -7,9 +10,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class SpringExceptionHandlar {
-    @ExceptionHandler(value = CandidateNotFoundException.class)
+    @ExceptionHandler(value = NpcNotFoundException.class)
     public ResponseEntity<Object> candidateNotFoundHandler() {
-        return new ResponseEntity<>("Candidate not found", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Npc not found", HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = LockTimeOutException.class)
